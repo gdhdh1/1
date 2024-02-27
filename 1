@@ -1,0 +1,109 @@
+#include <iostream>
+using namespace std;
+//Создание основного массива
+char board[3][3] = { {' ', ' ', ' '}, {' ', ' ', ' '}, {' ', ' ', ' '} };
+char currentPlayer = 'X';
+
+// Проверка Выигрыша ИИ\ Игрока
+bool Win() {
+    // Проверка строк и столбцов
+    for (int i = 0; i < 3; i++) {
+        if (board[i][0] == currentPlayer && board[i][1] == currentPlayer && board[i][2] == currentPlayer) {
+            return true;
+        }
+        if (board[0][i] == currentPlayer && board[1][i] == currentPlayer && board[2][i] == currentPlayer) {
+            return true;
+        }
+    }
+    // Проверка диагоналей
+    if (board[0][0] == currentPlayer && board[1][1] == currentPlayer && board[2][2] == currentPlayer) {
+        return true;
+    }
+    if (board[0][2] == currentPlayer && board[1][1] == currentPlayer && board[2][0] == currentPlayer) {
+        return true;
+    }
+    return false;
+}
+// Полная ли доска
+bool isBoardFull() {
+    for (int i = 0; i < 3; i++) {
+        for (int j = 0; j < 3; j++) {
+            if (board[i][j] == ' ') {
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
+// Игрок делает ход
+void makeMove() {
+    int row, col;
+    cout << "Ваш Ход" << currentPlayer << endl;
+
+    if (currentPlayer == 'X') {
+        cout << "Введите номер строки (1-3): ";
+        cin >> row;
+        cout << "Введите номер столбца (1-3): ";
+        cin >> col;
+        row--;
+        col--;
+
+        if (row >= 0 && row < 3 && col >= 0 && col < 3 && board[row][col] == ' ') {
+            board[row][col] = currentPlayer;
+            currentPlayer = 'O';
+        } else {
+            cout << "Неправильно. Попробуй ещё раз." << endl;
+        }
+    } else {
+        // ИИ делает ход
+        // Перебираем все пустые клетки и выбираем случайную
+        int emptyCells[9][2];
+        int numEmptyCells = 0;
+
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                if (board[i][j] == ' ') {
+                    emptyCells[numEmptyCells][0] = i;
+                    emptyCells[numEmptyCells][1] = j;
+                    numEmptyCells++;
+                }
+            }
+        }
+
+        if (numEmptyCells > 0) {
+            int randomIndex = rand() % numEmptyCells;
+            row = emptyCells[randomIndex][0];
+            col = emptyCells[randomIndex][1];
+            board[row][col] = currentPlayer;
+            currentPlayer = 'X';
+        }
+    }
+}
+// Зарисовка поля
+void drawBoard() {
+    cout << "  1 2 3" << endl;
+    for (int i = 0; i < 3; i++) {
+        cout << i + 1 << " ";
+        for (int j = 0; j < 3; j++) {
+            cout << board[i][j] << " ";
+        }
+        cout << endl;
+    }
+}
+// Основой цикл игры
+int main() {
+    while (!Win() && !isBoardFull()) {
+        drawBoard();
+        makeMove();
+    }
+
+    drawBoard();
+
+    if (Win()) {
+        cout << "Победа " << currentPlayer << "!" << endl;
+    } else {
+        cout << "Ничья!" << endl;
+    }
+    return 0;
+}
